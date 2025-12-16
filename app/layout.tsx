@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "IndoProperty",
   description: "Indonesia Property Tokenization",
-  icons: {
-    icon: "/favicon.png",
-  },
 };
 
 export default function RootLayout({
@@ -27,6 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
