@@ -1,37 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IndoProperty
+## 🔐 Smart Contracts
 
-## Getting Started
+### 1️⃣ IndoPropertyIdentityRegistry
+Handles:
+- Investor identity registration
+- Country code (Indonesia = 360)
+- Verification status used by ERC-3643 token
 
-First, run the development server:
+### 2️⃣ IndoPropertyToken3643
+- ERC-3643 compliant security token
+- Blocks transfers unless both sender & receiver are KYC verified
+- Represents fractional ownership of a real estate asset
+
+---
+
+## 🚀 Getting Started (Frontend)
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧪 Deploying Contracts (Remix)
 
-## Learn More
+1. Open **Remix IDE**
+2. Deploy `IndoPropertyIdentityRegistry.sol`
+3. Register investor identities
+4. Deploy `IndoPropertyToken3643.sol`
+5. Use the Identity Registry address in constructor
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚖️ Compliance Disclaimer
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is a **technical demonstration only**.
+It does **not** constitute an offer of securities or investment advice.
+Real-world deployment would require regulatory approval from relevant authorities (e.g., OJK in Indonesia).
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🏆 Hackathon Status
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# IndoProperty
+- Stage: Proof of Concept
+- Fundraising: Not currently fundraising
+- Focus: Technical validation & regulatory-aligned design
+
+---
+
+## 📜 License
+
+MIT License
+
+---
+
+## 🤝 Contact
+
+Built for Web3 RWA experimentation.
+For questions or collaboration, please reach out via the hackathon submission channel.
