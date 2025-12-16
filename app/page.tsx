@@ -12,8 +12,9 @@ export default function IndoPropertyWebsite() {
               alt="IndoProperty Logo"
               className="h-8 w-auto"
             />
-            <span className="text-lg font-bold text-slate-800">
-              IndoProperty
+            <span className="text-lg font-bold">
+              <span className="text-red-600">Indo</span>
+              <span className="text-blue-600">Property</span>
             </span>
           </div>
 
