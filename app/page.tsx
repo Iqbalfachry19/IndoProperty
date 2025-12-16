@@ -7,11 +7,16 @@ export default function IndoPropertyWebsite() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-red-600" />
+            <img
+              src="/logo.png"
+              alt="IndoProperty Logo"
+              className="h-8 w-auto"
+            />
             <span className="text-lg font-bold text-slate-800">
               IndoProperty
             </span>
           </div>
+
           <nav className="hidden md:flex gap-6 text-sm text-slate-600">
             <a href="#" className="hover:text-slate-900">
               Home
