@@ -51,6 +51,16 @@ Real-world deployment would require regulatory approval from relevant authoritie
 
 ---
 
+## Deployed Contracts
+
+- **IndoProperty ERC-3643 Token (Testnet / Hackathon Deployment)**
+`0xFC4f507AD62D7E103Ed43da4A0F5B8F671623c28`
+- **IndoPropertyIdentityRegistry (Testnet / Hackathon Deployment)**
+`0x9a59B64C556F18F85F86ADa0172c0F44b72Fe488`
+> ⚠️ This address is for hackathon demonstration purposes only and not intended for production use.
+
+---
+
 ## 📜 License
 
 MIT License
