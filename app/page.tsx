@@ -1,6 +1,7 @@
 import { Button } from "@/app/components/ui/Button";
 import Link from "next/link";
 import { ConnectWallet } from "@/app/components/ConnectWallet";
+import Image from "next/image";
 
 export default function IndoPropertyWebsite() {
   return (
@@ -110,7 +111,7 @@ export default function IndoPropertyWebsite() {
           <h2 className="text-2xl font-bold mb-6">
             Featured Property: Apartment Green View Unit 12B
           </h2>
-          <img
+          <Image
             src="/186684_1.jpg"
             alt="Apartemen Green View Unit 12B"
             className="rounded-xl shadow mb-6"
