@@ -152,7 +152,7 @@ Real Estate SPV
 
 # Regulatory Disclaimer
 
-This project is provided solely for research, educational, and hackathon demonstration purposes.
+This project is provided solely for research, educational, and demonstration purposes.
 
 It is **not** an offer to sell securities, investment products, or financial services.
 
@@ -160,15 +160,6 @@ Any production deployment involving tokenized real-world assets would require co
 
 ---
 
-# Hackathon Status
-
-* Stage: Proof of Concept
-* Status: Active Development
-* Focus: Real World Asset (RWA) Infrastructure
-* Standard: ERC-3643 Security Token
-* Target Market: Indonesian Real Estate
-
----
 
 # Testnet Deployment
 
@@ -184,7 +175,7 @@ Any production deployment involving tokenized real-world assets would require co
 0x9a59B64C556F18F85F86ADa0172c0F44b72Fe488
 ```
 
-> These contracts are deployed exclusively for hackathon demonstrations and testing. They should not be used in production environments.
+> These contracts are deployed exclusively for demonstrations and testing. They should not be used in production environments.
 
 ---
 
