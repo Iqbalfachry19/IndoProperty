@@ -59,21 +59,27 @@ export default function IndoPropertyWebsite() {
           priority
           className="object-cover"
         />
-        <div className="bg-black/50">
-          <div className="max-w-7xl mx-auto px-6 py-28 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+
+        <div className="absolute inset-0 bg-black/55" />
+
+        <div className="relative z-10 flex h-full items-center justify-center">
+          <div className="max-w-4xl px-6 text-center text-white">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Tokenizing Indonesian Real Estate
             </h1>
-            <p className="mb-8 text-lg">
+
+            <p className="text-lg md:text-xl text-slate-200 mb-8">
               Fractional Ownership of Real Estate with ERC-3643 Compliance.
             </p>
+
             <div className="flex justify-center gap-4">
               <Button className="bg-red-600 hover:bg-red-700">
                 Get Started
               </Button>
+
               <Button
                 variant="outline"
-                className="border-white  hover:bg-white hover:text-slate-900"
+                className="border-white text-white hover:bg-white hover:text-slate-900"
               >
                 Learn More
               </Button>
