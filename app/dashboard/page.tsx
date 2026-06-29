@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   ArrowUpRight,
   Building2,
@@ -8,16 +7,22 @@ import {
   Wallet,
   TrendingUp,
   ShieldCheck,
-  Landmark,
   PieChart,
   Activity,
   AlertTriangle,
   Lock,
+  WifiOff,
 } from "lucide-react";
+import { useEffect } from "react";
 
 import { Button } from "@/app/components/ui/Button";
 import { ConnectWallet } from "@/app/components/ConnectWallet";
-import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useReadContracts,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { CONTRACT_ADDRESSES, TokenABI } from "@/app/lib/web3/abi";
 import { formatUnits } from "viem";
 import {
@@ -27,15 +32,19 @@ import {
   CardTitle,
 } from "@/app/components/ui/card";
 
-// ─── helpers ────────────────────────────────────────────────────────────────
+// ─── constants ───────────────────────────────────────────────────────────────
 
-function formatIDR(wei: bigint | undefined): string {
-  if (!wei) return "Rp 0";
-  // contract stores IDR as plain integer (not wei-scaled for fiat)
-  // adjust divisor if your contract uses a different precision
-  const n = Number(wei);
-  if (n >= 1_000_000_000) return `Rp ${(n / 1_000_000_000).toFixed(2)}B`;
-  if (n >= 1_000_000)     return `Rp ${(n / 1_000_000).toFixed(2)}M`;
+const MANTLE_SEPOLIA_CHAIN_ID = 5003;
+const NATIVE_SYMBOL = "MNT";
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+function formatIDR(val: bigint | undefined): string {
+  if (!val) return "Rp 0";
+  const n = Number(val);
+  if (n >= 1_000_000_000_000) return `Rp ${(n / 1_000_000_000_000).toFixed(2)}T`;
+  if (n >= 1_000_000_000)     return `Rp ${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000)         return `Rp ${(n / 1_000_000).toFixed(2)}M`;
   return `Rp ${n.toLocaleString("id-ID")}`;
 }
 
@@ -44,14 +53,17 @@ function formatBps(bps: bigint | undefined): string {
   return `${(Number(bps) / 100).toFixed(2)}%`;
 }
 
-function shortAddr(addr: string): string {
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+function formatMNT(wei: bigint | undefined, decimals = 6): string {
+  if (!wei) return `0 ${NATIVE_SYMBOL}`;
+  return `${parseFloat(formatUnits(wei, 18)).toFixed(decimals)} ${NATIVE_SYMBOL}`;
 }
 
 // ─── component ───────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const { address, isConnected, chain } = useAccount();
+
+  const isWrongNetwork = isConnected && chain?.id !== MANTLE_SEPOLIA_CHAIN_ID;
 
   const tokenContract = {
     address: CONTRACT_ADDRESSES.SPVToken as `0x${string}`,
@@ -61,17 +73,17 @@ export default function DashboardPage() {
   // ── batch read ──────────────────────────────────────────────────────────────
   const { data, refetch } = useReadContracts({
     contracts: [
-      { ...tokenContract, functionName: "balanceOf",           args: address ? [address] : undefined },
+      { ...tokenContract, functionName: "balanceOf",          args: address ? [address] : undefined },
       { ...tokenContract, functionName: "totalSupply" },
       { ...tokenContract, functionName: "propertyInfo" },
       { ...tokenContract, functionName: "totalRentDistributed" },
       { ...tokenContract, functionName: "paused" },
-      { ...tokenContract, functionName: "pendingRentOf",       args: address ? [address] : undefined },
-      { ...tokenContract, functionName: "isFrozen",            args: address ? [address] : undefined },
-      { ...tokenContract, functionName: "getFrozenTokens",     args: address ? [address] : undefined },
+      { ...tokenContract, functionName: "pendingRentOf",      args: address ? [address] : undefined },
+      { ...tokenContract, functionName: "isFrozen",           args: address ? [address] : undefined },
+      { ...tokenContract, functionName: "getFrozenTokens",    args: address ? [address] : undefined },
       { ...tokenContract, functionName: "accRentPerToken" },
     ],
-    query: { enabled: !!address },
+    query: { enabled: !!address && !isWrongNetwork },
   });
 
   const [
@@ -86,17 +98,16 @@ export default function DashboardPage() {
     accRentResult,
   ] = data ?? [];
 
-  const balance          = balanceResult?.result          as bigint | undefined;
-  const totalSupply      = totalSupplyResult?.result      as bigint | undefined;
-  const propertyInfo     = propertyInfoResult?.result     as readonly [string, string, string, bigint, bigint, bigint, bigint, boolean] | undefined;
-  const totalRent        = totalRentResult?.result        as bigint | undefined;
-  const paused           = pausedResult?.result           as boolean | undefined;
-  const pendingRent      = pendingRentResult?.result      as bigint | undefined;
-  const isFrozen         = isFrozenResult?.result         as boolean | undefined;
-  const frozenTokens     = frozenTokensResult?.result     as bigint | undefined;
-  const accRentPerToken  = accRentResult?.result          as bigint | undefined;
+  const balance         = balanceResult?.result         as bigint | undefined;
+  const totalSupply     = totalSupplyResult?.result     as bigint | undefined;
+  const propertyInfo    = propertyInfoResult?.result    as readonly [string, string, string, bigint, bigint, bigint, bigint, boolean] | undefined;
+  const totalRent       = totalRentResult?.result       as bigint | undefined;
+  const paused          = pausedResult?.result          as boolean | undefined;
+  const pendingRent     = pendingRentResult?.result     as bigint | undefined;
+  const isFrozen        = isFrozenResult?.result        as boolean | undefined;
+  const frozenTokens    = frozenTokensResult?.result    as bigint | undefined;
+  const accRentPerToken = accRentResult?.result         as bigint | undefined;
 
-  // destructure propertyInfo tuple
   const [
     propName,
     propAddress,
@@ -108,18 +119,30 @@ export default function DashboardPage() {
     isLiquidated,
   ] = propertyInfo ?? [];
 
-  // derived values
-  const formattedBalance   = balance    ? formatUnits(balance,    18) : "0";
-  const formattedSupply    = totalSupply ? formatUnits(totalSupply, 18) : "0";
-  const formattedFrozen    = frozenTokens ? formatUnits(frozenTokens, 18) : "0";
-  const formattedPending   = pendingRent  ? formatUnits(pendingRent,  18) : "0"; // in ETH/native — adapt if IDR-denominated
-  const ownershipPct       = balance && totalSupply && totalSupply > 0n
-    ? ((Number(balance) / Number(totalSupply)) * 100).toFixed(4)
-    : "0";
+  // derived
+  const formattedBalance = formatUnits(balance ?? 0n, 18);
+  const formattedSupply  = formatUnits(totalSupply ?? 0n, 18);
+  const formattedFrozen  = formatUnits(frozenTokens ?? 0n, 18);
+  const ownershipPct     =
+    balance && totalSupply && totalSupply > 0n
+      ? ((Number(balance) / Number(totalSupply)) * 100).toFixed(4)
+      : "0";
 
-  // ── claim rent write ────────────────────────────────────────────────────────
-  const { writeContract, data: claimTxHash, isPending: isClaimPending } = useWriteContract();
-  const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({ hash: claimTxHash });
+  // ── claim rent ─────────────────────────────────────────────────────────────
+  const {
+    writeContract,
+    data: claimTxHash,
+    isPending: isClaimPending,
+    reset: resetClaim,
+  } = useWriteContract();
+
+  const { isLoading: isClaimConfirming, isSuccess: isClaimSuccess } =
+    useWaitForTransactionReceipt({ hash: claimTxHash });
+
+  // refetch on-chain data after successful claim
+  useEffect(() => {
+    if (isClaimSuccess) refetch();
+  }, [isClaimSuccess, refetch]);
 
   function handleClaimRent() {
     writeContract({
@@ -129,7 +152,15 @@ export default function DashboardPage() {
     });
   }
 
-  // ── status badges ───────────────────────────────────────────────────────────
+  const claimDisabled =
+    !isConnected ||
+    isWrongNetwork ||
+    !pendingRent ||
+    pendingRent === 0n ||
+    isClaimPending ||
+    isClaimConfirming;
+
+  // ── compliance status ───────────────────────────────────────────────────────
   const complianceLabel = isLiquidated
     ? "Liquidated"
     : paused
@@ -146,9 +177,10 @@ export default function DashboardPage() {
     ? "text-orange-600"
     : "text-green-600";
 
-  // ─── render ─────────────────────────────────────────────────────────────────
+  // ─── render ──────────────────────────────────────────────────────────────────
   return (
     <main className="flex-1 text-black bg-slate-50 min-h-screen">
+
       {/* ── Header ── */}
       <section className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-8 py-8 flex flex-col lg:flex-row justify-between gap-6">
@@ -167,63 +199,72 @@ export default function DashboardPage() {
       </section>
 
       {/* ── Alerts ── */}
-      {(paused || isFrozen || isLiquidated) && (
-        <div className="max-w-7xl mx-auto px-8 pt-6">
-          {isLiquidated && (
-            <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-4 text-red-700 text-sm mb-3">
-              <AlertTriangle size={16} />
-              This property SPV has been liquidated. Token transfers are disabled.
-            </div>
-          )}
-          {paused && !isLiquidated && (
-            <div className="flex items-center gap-2 rounded-lg bg-yellow-50 border border-yellow-200 p-4 text-yellow-700 text-sm mb-3">
-              <AlertTriangle size={16} />
-              Token contract is currently paused by the SPV manager.
-            </div>
-          )}
-          {isFrozen && (
-            <div className="flex items-center gap-2 rounded-lg bg-orange-50 border border-orange-200 p-4 text-orange-700 text-sm mb-3">
-              <Lock size={16} />
-              Your address is frozen. Contact the SPV manager for assistance.
-            </div>
-          )}
-        </div>
-      )}
+      <div className="max-w-7xl mx-auto px-8 pt-6 space-y-3">
+        {isWrongNetwork && (
+          <div className="flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 p-4 text-blue-700 text-sm">
+            <WifiOff size={16} />
+            Wrong network. Please switch to <strong className="mx-1">Mantle Sepolia</strong> (Chain ID: {MANTLE_SEPOLIA_CHAIN_ID}).
+          </div>
+        )}
+        {isLiquidated && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-4 text-red-700 text-sm">
+            <AlertTriangle size={16} />
+            This SPV has been liquidated. Token transfers are disabled.
+          </div>
+        )}
+        {paused && !isLiquidated && (
+          <div className="flex items-center gap-2 rounded-lg bg-yellow-50 border border-yellow-200 p-4 text-yellow-700 text-sm">
+            <AlertTriangle size={16} />
+            Token contract is currently paused by the SPV manager.
+          </div>
+        )}
+        {isFrozen && (
+          <div className="flex items-center gap-2 rounded-lg bg-orange-50 border border-orange-200 p-4 text-orange-700 text-sm">
+            <Lock size={16} />
+            Your address is frozen. Contact the SPV manager for assistance.
+          </div>
+        )}
+        {isClaimSuccess && (
+          <div className="flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 p-4 text-green-700 text-sm">
+            ✓ Rent claimed successfully! Your balance has been updated.
+          </div>
+        )}
+      </div>
 
       {/* ── Stats ── */}
       <section className="max-w-7xl mx-auto px-8 py-8">
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Appraised Value */}
+
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between">
                 <div>
-                  <p className="text-sm text-slate-500">Property Value</p>
+                  <p className="text-sm text-slate-500">Appraised Value</p>
                   <h2 className="text-2xl font-bold mt-2">{formatIDR(appraisedValue)}</h2>
                   <p className="text-slate-500 text-sm mt-2">
                     {totalAreaM2 ? `${totalAreaM2.toString()} m²` : "—"}
                   </p>
                 </div>
-                <Wallet className="text-red-600" />
+                <Wallet className="text-red-600 shrink-0" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Token Holdings */}
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between">
                 <div>
                   <p className="text-sm text-slate-500">My Tokens</p>
-                  <h2 className="text-3xl font-bold mt-2">{parseFloat(formattedBalance).toLocaleString()}</h2>
+                  <h2 className="text-3xl font-bold mt-2">
+                    {parseFloat(formattedBalance).toLocaleString()}
+                  </h2>
                   <p className="text-slate-500 text-sm mt-2">{ownershipPct}% ownership</p>
                 </div>
-                <Building2 className="text-blue-600" />
+                <Building2 className="text-blue-600 shrink-0" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Expected Yield */}
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between">
@@ -232,29 +273,31 @@ export default function DashboardPage() {
                   <h2 className="text-3xl font-bold mt-2">{formatBps(expectedYieldBps)}</h2>
                   <p className="text-green-600 text-sm mt-2">Annual</p>
                 </div>
-                <TrendingUp className="text-green-600" />
+                <TrendingUp className="text-green-600 shrink-0" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Compliance */}
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between">
                 <div>
                   <p className="text-sm text-slate-500">Compliance</p>
-                  <h2 className={`text-2xl font-bold mt-2 ${complianceColor}`}>{complianceLabel}</h2>
+                  <h2 className={`text-2xl font-bold mt-2 ${complianceColor}`}>
+                    {complianceLabel}
+                  </h2>
                   <p className="text-green-600 text-sm mt-2">ERC-3643</p>
                 </div>
-                <ShieldCheck className="text-emerald-600" />
+                <ShieldCheck className="text-emerald-600 shrink-0" />
               </div>
             </CardContent>
           </Card>
+
         </div>
 
-        {/* ── Property Info + Wallet ── */}
+        {/* ── Property Details + Wallet ── */}
         <div className="grid lg:grid-cols-3 gap-6 mt-8">
-          {/* Property Details */}
+
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Property Details</CardTitle>
@@ -284,15 +327,19 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-slate-500">Total Supply</p>
-                    <p className="font-medium mt-1">{parseFloat(formattedSupply).toLocaleString()} PROP</p>
+                    <p className="font-medium mt-1">
+                      {parseFloat(formattedSupply).toLocaleString()} PROP
+                    </p>
                   </div>
                   <div>
                     <p className="text-slate-500">Total Rent Distributed</p>
-                    <p className="font-medium mt-1">{parseFloat(formatUnits(totalRent ?? 0n, 18)).toFixed(6)} ETH</p>
+                    <p className="font-medium mt-1">{formatMNT(totalRent)}</p>
                   </div>
                   <div>
                     <p className="text-slate-500">Area</p>
-                    <p className="font-medium mt-1">{totalAreaM2?.toString() ?? "—"} m²</p>
+                    <p className="font-medium mt-1">
+                      {totalAreaM2?.toString() ?? "—"} m²
+                    </p>
                   </div>
                   <div>
                     <p className="text-slate-500">Status</p>
@@ -300,65 +347,70 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ) : (
-                <div className="h-[250px] rounded-xl border border-dashed flex items-center justify-center text-slate-400">
-                  {isConnected ? "Loading property data…" : "Connect wallet to load data"}
+                <div className="h-[250px] rounded-xl border border-dashed flex items-center justify-center text-slate-400 text-sm">
+                  {!isConnected
+                    ? "Connect wallet to load property data"
+                    : isWrongNetwork
+                    ? "Switch to Mantle Sepolia to load data"
+                    : "Loading property data…"}
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Wallet */}
           <Card>
             <CardHeader>
               <CardTitle>Wallet</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-4">
               <div>
                 <p className="text-sm text-slate-500">Connected Address</p>
-                <p className="font-medium mt-2 break-all text-sm">
+                <p className="font-medium mt-1 break-all text-sm">
                   {isConnected && address ? address : "Not Connected"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Network</p>
-                <p className="font-medium mt-2">{isConnected && chain ? chain.name : "—"}</p>
+                <p className={`font-medium mt-1 text-sm ${isWrongNetwork ? "text-red-600" : ""}`}>
+                  {isConnected && chain ? chain.name : "—"}
+                  {isWrongNetwork && " ⚠ Wrong network"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">PROP Balance</p>
-                <p className="font-medium mt-2 text-red-600">
+                <p className="font-medium mt-1 text-red-600">
                   {parseFloat(formattedBalance).toLocaleString()} PROP
                 </p>
               </div>
               {frozenTokens !== undefined && frozenTokens > 0n && (
                 <div>
                   <p className="text-sm text-slate-500">Frozen Tokens</p>
-                  <p className="font-medium mt-2 text-orange-600">
+                  <p className="font-medium mt-1 text-orange-600">
                     {parseFloat(formattedFrozen).toLocaleString()} PROP
                   </p>
                 </div>
               )}
               <div>
                 <p className="text-sm text-slate-500">Claimable Rent</p>
-                <p className="font-medium mt-2 text-green-600">
-                  {parseFloat(formattedPending).toFixed(6)} ETH
+                <p className="font-medium mt-1 text-green-600">
+                  {formatMNT(pendingRent)}
                 </p>
               </div>
-              {/* Claim Rent */}
               <Button
-                className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                className="w-full bg-green-600 hover:bg-green-700"
                 onClick={handleClaimRent}
-                disabled={!isConnected || !pendingRent || pendingRent === 0n || isClaimPending || isClaimConfirming}
+                disabled={claimDisabled}
               >
-                {isClaimPending || isClaimConfirming ? "Claiming…" : "Claim Rent"}
+                {isClaimPending
+                  ? "Waiting for signature…"
+                  : isClaimConfirming
+                  ? "Confirming…"
+                  : "Claim Rent"}
               </Button>
-              {isClaimSuccess && (
-                <p className="text-green-600 text-sm text-center">
-                  ✓ Rent claimed successfully!
-                </p>
-              )}
               <Button className="w-full" variant="outline">View Wallet</Button>
             </CardContent>
           </Card>
+
         </div>
 
         {/* ── Token Summary ── */}
@@ -370,13 +422,13 @@ export default function DashboardPage() {
             <table className="w-full text-sm">
               <thead className="text-left border-b">
                 <tr>
-                  <th className="py-3">Property</th>
-                  <th>My Tokens</th>
-                  <th>Token Price</th>
-                  <th>Yield</th>
-                  <th>Supply</th>
-                  <th>Ownership</th>
-                  <th></th>
+                  <th className="py-3 font-medium">Property</th>
+                  <th className="font-medium">My Tokens</th>
+                  <th className="font-medium">Token Price</th>
+                  <th className="font-medium">Yield</th>
+                  <th className="font-medium">Total Supply</th>
+                  <th className="font-medium">Ownership</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
@@ -396,8 +448,12 @@ export default function DashboardPage() {
                   </tr>
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-400">
-                      {isConnected ? "Loading…" : "Connect wallet to view holdings"}
+                    <td colSpan={7} className="py-10 text-center text-slate-400">
+                      {!isConnected
+                        ? "Connect wallet to view holdings"
+                        : isWrongNetwork
+                        ? "Switch to Mantle Sepolia"
+                        : "Loading…"}
                     </td>
                   </tr>
                 )}
@@ -408,42 +464,40 @@ export default function DashboardPage() {
 
         {/* ── Bottom ── */}
         <div className="grid lg:grid-cols-2 gap-6 mt-8">
-          {/* Recent Activity */}
+
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>On-Chain Stats</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               {isClaimSuccess && (
-                <div className="flex justify-between">
+                <div className="flex justify-between items-start">
                   <div className="flex gap-3">
-                    <Coins className="text-green-600" />
+                    <Coins className="text-green-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium">Rent Claimed</p>
                       <p className="text-sm text-slate-500">{propName ?? "SPV Token"}</p>
                     </div>
                   </div>
-                  <span className="text-sm text-slate-500">Just now</span>
+                  <span className="text-sm text-slate-500 shrink-0">Just now</span>
                 </div>
               )}
-              <div className="flex justify-between">
+              <div className="flex justify-between items-start">
                 <div className="flex gap-3">
-                  <Activity className="text-blue-600" />
+                  <Activity className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium">Total Rent Distributed</p>
-                    <p className="text-sm text-slate-500">
-                      {parseFloat(formatUnits(totalRent ?? 0n, 18)).toFixed(6)} ETH (all time)
-                    </p>
+                    <p className="text-sm text-slate-500">{formatMNT(totalRent)} (all-time)</p>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-start">
                 <div className="flex gap-3">
-                  <PieChart className="text-purple-600" />
+                  <PieChart className="text-purple-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium">Acc. Rent / Token</p>
                     <p className="text-sm text-slate-500">
-                      {parseFloat(formatUnits(accRentPerToken ?? 0n, 18)).toFixed(8)} ETH/PROP
+                      {formatMNT(accRentPerToken, 8)} / PROP
                     </p>
                   </div>
                 </div>
@@ -451,7 +505,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
@@ -463,12 +516,13 @@ export default function DashboardPage() {
               <Button
                 variant="outline"
                 onClick={handleClaimRent}
-                disabled={!isConnected || !pendingRent || pendingRent === 0n || isClaimPending || isClaimConfirming}
+                disabled={claimDisabled}
               >
-                Claim Yield
+                {isClaimPending || isClaimConfirming ? "Claiming…" : "Claim Yield"}
               </Button>
             </CardContent>
           </Card>
+
         </div>
       </section>
     </main>
