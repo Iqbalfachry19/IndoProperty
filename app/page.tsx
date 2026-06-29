@@ -36,7 +36,10 @@ export default function IndoPropertyWebsite() {
               Contact
             </a>
           </nav>
-          <Link href={"/dashboard"} className="bg-red-600 hover:bg-red-700">
+          <Link
+            href={"/dashboard"}
+            className="inline-flex items-center justify-center rounded-md font-medium transition bg-red-600 hover:bg-red-700"
+          >
             Launch App
           </Link>
         </div>
