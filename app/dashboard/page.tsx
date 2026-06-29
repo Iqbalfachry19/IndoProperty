@@ -23,7 +23,7 @@ import {
 
 export default function DashboardPage() {
   return (
-    <main className="flex-1 bg-slate-50 min-h-screen">
+    <main className="flex-1 text-black bg-slate-50 min-h-screen">
       {/* Header */}
       <section className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-8 py-8 flex flex-col lg:flex-row justify-between gap-6">
