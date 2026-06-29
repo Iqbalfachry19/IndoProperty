@@ -54,8 +54,7 @@ export default function IndoPropertyWebsite() {
       <section
         className="relative bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1549692520-acc6669e2f0c')",
+          backgroundImage: "/unsplash.jpg",
         }}
       >
         <div className="bg-black/50">
