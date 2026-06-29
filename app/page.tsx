@@ -108,16 +108,14 @@ export default function IndoPropertyWebsite() {
       <section className="py-16 bg-slate-100">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold mb-6">
-            Featured Property: Apartemen Green View Unit 12B
+            Featured Property: Apartment Green View Unit 12B
           </h2>
           <img
             src="/186684_1.jpg"
             alt="Apartemen Green View Unit 12B"
             className="rounded-xl shadow mb-6"
           />
-          <p className="mb-6 text-slate-600">
-            Invest in Prime Bekasi Real Estate
-          </p>
+          <p className="mb-6 text-slate-600">Invest in Serpong Real Estate</p>
           <Button className="bg-red-600 hover:bg-red-700">View Details</Button>
         </div>
       </section>
