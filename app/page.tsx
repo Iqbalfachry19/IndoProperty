@@ -67,7 +67,7 @@ export default function IndoPropertyWebsite() {
               </Button>
               <Button
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-slate-900"
+                className="border-white  hover:bg-white hover:text-slate-900"
               >
                 Learn More
               </Button>
