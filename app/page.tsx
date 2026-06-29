@@ -1,5 +1,5 @@
 import { Button } from "@/app/components/ui/Button";
-import { Link } from "./components/ui/Link";
+import Link from "next/link";
 
 export default function IndoPropertyWebsite() {
   return (
