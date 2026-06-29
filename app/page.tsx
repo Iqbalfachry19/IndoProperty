@@ -38,7 +38,7 @@ export default function IndoPropertyWebsite() {
           </nav>
           <Link
             href={"/dashboard"}
-            className="inline-flex items-center justify-center rounded-md font-medium transition bg-red-600 hover:bg-red-700"
+            className="inline-flex items-center justify-center rounded-md font-medium transitionbg-red-600 text-white hover:bg-red-700"
           >
             Launch App
           </Link>
