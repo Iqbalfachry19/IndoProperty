@@ -51,12 +51,14 @@ export default function IndoPropertyWebsite() {
       </header>
 
       {/* Hero */}
-      <section
-        className="relative bg-cover bg-center"
-        style={{
-          backgroundImage: "/unsplash.jpg",
-        }}
-      >
+      <section className="relative h-[650px] overflow-hidden">
+        <Image
+          src="/unsplash.jpg"
+          alt="Indonesian Real Estate"
+          fill
+          priority
+          className="object-cover"
+        />
         <div className="bg-black/50">
           <div className="max-w-7xl mx-auto px-6 py-28 text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
