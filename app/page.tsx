@@ -112,11 +112,15 @@ export default function IndoPropertyWebsite() {
           <h2 className="text-2xl font-bold mb-6">
             Featured Property: Apartment Green View Unit 12B
           </h2>
-          <Image
-            src="/186684_1.jpg"
-            alt="Apartemen Green View Unit 12B"
-            className="rounded-xl shadow mb-6"
-          />
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/186684_1.jpg"
+              alt="Apartment Green View Unit 12B"
+              width={900}
+              height={550}
+              className="rounded-xl shadow-xl object-cover w-full max-w-4xl h-auto"
+            />
+          </div>
           <p className="mb-6 text-slate-600">Invest in Serpong Real Estate</p>
           <Button className="bg-red-600 hover:bg-red-700">View Details</Button>
         </div>
