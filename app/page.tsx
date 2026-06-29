@@ -108,11 +108,11 @@ export default function IndoPropertyWebsite() {
       <section className="py-16 bg-slate-100">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold mb-6">
-            Featured Property: Transpark Juanda Bekasi
+            Featured Property: Apartemen Green View Unit 12B
           </h2>
           <img
-            src="https://images.unsplash.com/photo-1590650046871-92c887180603"
-            alt="Transpark Juanda"
+            src="/186684_1.jpg"
+            alt="Apartemen Green View Unit 12B"
             className="rounded-xl shadow mb-6"
           />
           <p className="mb-6 text-slate-600">
