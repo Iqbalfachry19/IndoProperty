@@ -1,0 +1,3 @@
+[submodule "indoproperty/lib/forge-std"]
+	path = indoproperty/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
