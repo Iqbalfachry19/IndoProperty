@@ -43,7 +43,7 @@ contract IndoPropertySPVTest is Test {
     uint256 constant PROPERTY_VALUE = 5_000_000_000; // Rp 5 miliar
     uint256 constant TOKEN_PRICE_IDR = 10_000_000; // Rp 10 juta per token
     uint256 constant TOTAL_SUPPLY = 500 * 1e18; // 500 token
-    uint256 constant MIN_INVESTMENT = 10_000_000 * 1e18; // 1 token minimum
+    uint256 constant MIN_INVESTMENT = 1 * 1e18; // 1 token minimum
 
     uint16 constant ID_INDONESIA = 360;
     uint16 constant ID_SINGAPORE = 702;
@@ -158,7 +158,8 @@ contract IndoPropertySPVTest is Test {
         assertTrue(compliance.isTokenBound(address(token)));
     }
 
-    function test_ComplianceCanTransferVerifiedInvestors() public view {
+    function test_ComplianceCanTransferVerifiedInvestors() public {
+        vm.warp(block.timestamp + 181 days);
         assertTrue(compliance.canTransfer(investorA, investorB, 10 * 1e18));
     }
 
@@ -260,6 +261,7 @@ contract IndoPropertySPVTest is Test {
     }
 
     function test_TokenForcedTransfer() public {
+        vm.warp(block.timestamp + 181 days);
         vm.prank(deployer);
         token.forcedTransfer(investorA, investorB, 50 * 1e18);
         assertEq(token.balanceOf(investorA), 150 * 1e18);

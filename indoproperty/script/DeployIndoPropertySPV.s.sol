@@ -36,8 +36,8 @@ contract DeployIndoPropertySPV is Script {
         IndoPropertyCompliance compliance = new IndoPropertyCompliance(
             address(identityRegistry)
         );
-        // Rp 10 juta minimum investment (token units dengan 18 desimal)
-        compliance.setMinInvestment(10_000_000 * 1e18);
+        // 1 token minimum (Rp 10 juta per token)
+        compliance.setMinInvestment(1 * 1e18);
         console.log("Compliance        :", address(compliance));
 
         // ── 3. SPV Token ──────────────────────────────────────
@@ -62,8 +62,9 @@ contract DeployIndoPropertySPV is Script {
         compliance.setWhitelisted(address(token), true);
 
         // ── 5. SPV Registry ───────────────────────────────────
-        SPVRegistry spvRegistry = new SPVRegistry(address(identityRegistry));
-        console.log("SPVRegistry       :", address(spvRegistry));
+        // SPVRegistry is currently too large to deploy due to factory pattern
+        // SPVRegistry spvRegistry = new SPVRegistry(address(identityRegistry));
+        // console.log("SPVRegistry       :", address(spvRegistry));
 
         vm.stopBroadcast();
 
@@ -76,7 +77,7 @@ contract DeployIndoPropertySPV is Script {
         console.log("IdentityRegistry  :", address(identityRegistry));
         console.log("Compliance        :", address(compliance));
         console.log("SPVToken (PROP)   :", address(token));
-        console.log("SPVRegistry       :", address(spvRegistry));
+        // console.log("SPVRegistry       :", address(spvRegistry));
         console.log("==========================");
         console.log("\nNext steps:");
         console.log("1. Set KYC_AGENT sebagai agent di IdentityRegistry");

@@ -1,5 +1,6 @@
 import { Button } from "@/app/components/ui/Button";
 import Link from "next/link";
+import { ConnectWallet } from "@/app/components/ConnectWallet";
 
 export default function IndoPropertyWebsite() {
   return (
@@ -36,12 +37,15 @@ export default function IndoPropertyWebsite() {
               Contact
             </a>
           </nav>
-          <Link
-            href={"/dashboard"}
-            className="inline-flex items-center justify-center rounded-md font-medium transition bg-red-600 h-10 px-4 text-sm text-white hover:bg-red-700"
-          >
-            Launch App
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href={"/dashboard"}
+              className="inline-flex items-center justify-center rounded-md font-medium transition bg-red-600 h-10 px-4 text-sm text-white hover:bg-red-700"
+            >
+              Launch App
+            </Link>
+            <ConnectWallet />
+          </div>
         </div>
       </header>
 
