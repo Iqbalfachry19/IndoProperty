@@ -127,9 +127,8 @@ export default function DashboardPage() {
 
             <CardContent>
               <div className="h-[350px] rounded-xl border border-dashed flex items-center justify-center text-slate-400">
-                Portfolio Chart
+                Portfolio Chart Empty
                 <br />
-                (Recharts nanti)
               </div>
             </CardContent>
           </Card>
