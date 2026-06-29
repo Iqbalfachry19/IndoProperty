@@ -1,5 +1,5 @@
 import { Button } from "@/app/components/ui/Button";
-import { Link } from "lucide-react";
+import { Link } from "./components/ui/Link";
 
 export default function IndoPropertyWebsite() {
   return (

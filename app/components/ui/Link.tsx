@@ -1,4 +1,4 @@
-import Link, { LinkProps } from "next/link";
+import { LinkProps } from "next/link";
 import React from "react";
 import clsx from "clsx";
 
@@ -8,7 +8,7 @@ interface ButtonProps extends LinkProps {
   variant?: "default" | "outline";
 }
 
-export function Button({
+export function Link({
   children,
   className,
   variant = "default",
