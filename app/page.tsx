@@ -1,4 +1,5 @@
 import { Button } from "@/app/components/ui/Button";
+import { Link } from "lucide-react";
 
 export default function IndoPropertyWebsite() {
   return (
@@ -35,7 +36,9 @@ export default function IndoPropertyWebsite() {
               Contact
             </a>
           </nav>
-          <Button className="bg-red-600 hover:bg-red-700">Launch App</Button>
+          <Link href={"/dashboard"} className="bg-red-600 hover:bg-red-700">
+            Launch App
+          </Link>
         </div>
       </header>
 

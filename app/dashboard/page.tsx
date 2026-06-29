@@ -1,150 +1,285 @@
+"use client";
+
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  Building2,
+  Coins,
+  Wallet,
+  TrendingUp,
+  ShieldCheck,
+  Landmark,
+  PieChart,
+  Activity,
+} from "lucide-react";
+
 import { Button } from "@/app/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
 
-export default function IndoPropertyWebsite() {
+export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Navbar */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="IndoProperty Logo"
-              className="h-8 w-auto"
-            />
-            <span className="text-lg font-bold">
-              <span className="text-red-600">Indo</span>
-              <span className="text-blue-600">Property</span>
-            </span>
-          </div>
-
-          <nav className="hidden md:flex gap-6 text-sm text-slate-600">
-            <a href="#" className="hover:text-slate-900">
-              Home
-            </a>
-            <a href="#" className="hover:text-slate-900">
-              About
-            </a>
-            <a href="#" className="hover:text-slate-900">
-              How It Works
-            </a>
-            <a href="#" className="hover:text-slate-900">
-              Properties
-            </a>
-            <a href="#" className="hover:text-slate-900">
-              Contact
-            </a>
-          </nav>
-          <Button className="bg-red-600 hover:bg-red-700">Launch App</Button>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section
-        className="relative bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1549692520-acc6669e2f0c')",
-        }}
-      >
-        <div className="bg-black/50">
-          <div className="max-w-7xl mx-auto px-6 py-28 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Tokenizing Indonesian Real Estate
-            </h1>
-            <p className="mb-8 text-lg">
-              Fractional Ownership of Real Estate with ERC-3643 Compliance.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Button className="bg-red-600 hover:bg-red-700">
-                Get Started
-              </Button>
-              <Button
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-slate-900"
-              >
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Highlights */}
-      <section className="bg-white py-10">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 px-6 text-center">
+    <main className="flex-1 bg-slate-50 min-h-screen">
+      {/* Header */}
+      <section className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-8 py-8 flex flex-col lg:flex-row justify-between gap-6">
           <div>
-            <h3 className="font-semibold">Compliant & Secure</h3>
-            <p className="text-sm text-slate-600">
-              Built with regulatory-first design
+            <p className="text-sm text-slate-500">Welcome back 👋</p>
+
+            <h1 className="text-4xl font-bold mt-2">Investor Dashboard</h1>
+
+            <p className="text-slate-500 mt-2">
+              Manage your Indonesian Real Estate Security Tokens.
             </p>
           </div>
-          <div>
-            <h3 className="font-semibold">Fractional Ownership</h3>
-            <p className="text-sm text-slate-600">
-              Accessible real estate investing
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Built on ERC-3643</h3>
-            <p className="text-sm text-slate-600">
-              Institutional-grade security token
-            </p>
+
+          <div className="flex gap-3">
+            <Button variant="outline">Connect Wallet</Button>
+
+            <Button className="bg-red-600 hover:bg-red-700">
+              Browse Properties
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Featured Property */}
-      <section className="py-16 bg-slate-100">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-bold mb-6">
-            Featured Property: Transpark Juanda Bekasi
-          </h2>
-          <img
-            src="https://images.unsplash.com/photo-1590650046871-92c887180603"
-            alt="Transpark Juanda"
-            className="rounded-xl shadow mb-6"
-          />
-          <p className="mb-6 text-slate-600">
-            Invest in Prime Bekasi Real Estate
-          </p>
-          <Button className="bg-red-600 hover:bg-red-700">View Details</Button>
+      {/* Stats */}
+      <section className="max-w-7xl mx-auto px-8 py-8">
+        <div className="grid lg:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">Portfolio Value</p>
+
+                  <h2 className="text-3xl font-bold mt-2">Rp 2.45B</h2>
+
+                  <p className="text-green-600 text-sm mt-2">+12.5%</p>
+                </div>
+
+                <Wallet className="text-red-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">Properties</p>
+
+                  <h2 className="text-3xl font-bold mt-2">4</h2>
+
+                  <p className="text-slate-500 text-sm mt-2">Active SPVs</p>
+                </div>
+
+                <Building2 className="text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">Rental Yield</p>
+
+                  <h2 className="text-3xl font-bold mt-2">9.8%</h2>
+
+                  <p className="text-green-600 text-sm mt-2">Annual</p>
+                </div>
+
+                <TrendingUp className="text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">Compliance</p>
+
+                  <h2 className="text-2xl font-bold mt-2">Verified</h2>
+
+                  <p className="text-green-600 text-sm mt-2">ERC-3643</p>
+                </div>
+
+                <ShieldCheck className="text-emerald-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Content */}
+
+        <div className="grid lg:grid-cols-3 gap-6 mt-8">
+          {/* Portfolio */}
+
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Portfolio Overview</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <div className="h-[350px] rounded-xl border border-dashed flex items-center justify-center text-slate-400">
+                Portfolio Chart
+                <br />
+                (Recharts nanti)
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Wallet */}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Wallet</CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-5">
+              <div>
+                <p className="text-sm text-slate-500">Connected Address</p>
+
+                <p className="font-medium mt-2 break-all">0x7B2...91Fd</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-500">Network</p>
+
+                <p className="font-medium mt-2">Ethereum Sepolia</p>
+              </div>
+
+              <Button className="w-full">View Wallet</Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Holdings */}
+
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>My Holdings</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <table className="w-full">
+              <thead className="text-left border-b">
+                <tr>
+                  <th className="py-3">Property</th>
+
+                  <th>Tokens</th>
+
+                  <th>Value</th>
+
+                  <th>Yield</th>
+
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {[
+                  {
+                    name: "Transpark Juanda",
+                    value: "Rp 750M",
+                    token: "75",
+                    yield: "9.2%",
+                  },
+                  {
+                    name: "BSD Office Tower",
+                    value: "Rp 600M",
+                    token: "60",
+                    yield: "8.8%",
+                  },
+                  {
+                    name: "Bali Villa",
+                    value: "Rp 1.1B",
+                    token: "110",
+                    yield: "11.1%",
+                  },
+                ].map((item) => (
+                  <tr key={item.name} className="border-b hover:bg-slate-50">
+                    <td className="py-5 font-medium">{item.name}</td>
+
+                    <td>{item.token}</td>
+
+                    <td>{item.value}</td>
+
+                    <td className="text-green-600">{item.yield}</td>
+
+                    <td>
+                      <Button variant="ghost" size="sm">
+                        <ArrowUpRight size={18} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+
+        {/* Bottom */}
+
+        <div className="grid lg:grid-cols-2 gap-6 mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-5">
+              <div className="flex justify-between">
+                <div className="flex gap-3">
+                  <Coins className="text-red-600" />
+
+                  <div>
+                    <p className="font-medium">Purchased Tokens</p>
+
+                    <p className="text-sm text-slate-500">Transpark Juanda</p>
+                  </div>
+                </div>
+
+                <span>Today</span>
+              </div>
+
+              <div className="flex justify-between">
+                <div className="flex gap-3">
+                  <Activity className="text-blue-600" />
+
+                  <div>
+                    <p className="font-medium">Rental Yield Received</p>
+
+                    <p className="text-sm text-slate-500">Rp 2,500,000</p>
+                  </div>
+                </div>
+
+                <span>Yesterday</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+
+            <CardContent className="grid gap-4">
+              <Button>Browse Marketplace</Button>
+
+              <Button variant="outline">Transfer Tokens</Button>
+
+              <Button variant="outline">View Compliance</Button>
+
+              <Button variant="outline">Claim Yield</Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
-
-      {/* How it works */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-bold mb-10">
-            Invest in Indonesian Real Estate on the Blockchain
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="font-semibold">KYC Verified Users</h3>
-              <p className="text-sm text-slate-600">
-                On-chain identity verification
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Secure Transactions</h3>
-              <p className="text-sm text-slate-600">
-                ERC-3643 compliant transfers
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold">Earn Real Yield</h3>
-              <p className="text-sm text-slate-600">
-                Rental & asset-backed returns
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 text-center py-6 text-sm">
-        © 2025 IndoProperty. All rights reserved.
-      </footer>
-    </div>
+    </main>
   );
 }
