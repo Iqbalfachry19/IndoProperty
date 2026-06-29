@@ -122,8 +122,8 @@ export default function IndoPropertyWebsite() {
             <Image
               src="/186684_1.jpg"
               alt="Apartment Green View Unit 12B"
-              width={900}
-              height={550}
+              width={500}
+              height={350}
               className="rounded-xl shadow-xl object-cover w-full max-w-4xl h-auto"
             />
           </div>
