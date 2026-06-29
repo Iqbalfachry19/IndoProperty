@@ -1,184 +1,216 @@
 # IndoProperty
 
-> **Real World Asset (RWA) Tokenization Platform for Indonesian Real Estate** built on the ERC-3643 security token standard.
+> **Real World Asset (RWA) Tokenization Platform for Indonesian Real Estate**
+> Built on the ERC-3643 security token standard, deployed on Mantle Sepolia.
 
-IndoProperty is a proof-of-concept platform demonstrating how Indonesian real estate assets can be tokenized using compliant security tokens. The project combines identity verification, compliance enforcement, and property-specific SPV (Special Purpose Vehicle) tokenization into a modular architecture suitable for regulated digital securities.
-
----
-
-# Features
-
-* ERC-3643 compliant security token
-* Identity Registry with KYC verification
-* Compliance module with transfer restrictions
-* SPV-based property tokenization
-* Fractional ownership model
-* Modular smart contract architecture
-* Property metadata stored on-chain
-* Transfer restrictions based on investor verification
+IndoProperty is a proof-of-concept platform demonstrating how Indonesian real estate assets can be tokenized as compliant security tokens. The project combines on-chain identity verification, compliance enforcement, and property-specific SPV tokenization into a modular architecture suitable for regulated digital securities.
 
 ---
 
-# Smart Contracts
+## Features
 
-### IndoPropertySPVToken
-
-ERC-3643 security token representing fractional ownership of a single property.
-
-Features:
-
-* KYC-protected transfers
-* Mint & burn by authorized agents
-* Forced transfer (regulatory recovery)
-* Account freezing
-* Token freezing
-* Pause / unpause
-* Property metadata
-* ERC-3643 compliance hooks
+- ERC-3643 compliant security token (T-REX standard)
+- Identity Registry with KYC/AML verification
+- Compliance module with configurable transfer restrictions
+- SPV-based property tokenization
+- Fractional ownership with on-chain property metadata
+- Rent distribution and yield claiming
+- Forced transfer for regulatory recovery
+- Account and token-level freezing
+- Pause / unpause by authorized agents
+- Modular architecture — shared or dedicated identity registry per SPV
 
 ---
 
-### IdentityRegistry
+## Smart Contracts
 
-Responsible for investor identity management.
+### `IndoPropertySPVToken`
 
-Features:
+ERC-3643 security token representing fractional ownership of a single real estate property.
 
-* Investor registration
-* On-chain identity mapping
-* Country code management
-* Verification status
-* Authorized KYC agents
-
----
-
-### IndoPropertyCompliance
-
-Compliance engine implementing regulatory rules.
-
-Current rules include:
-
-* Verified investor requirement
-* Restricted country filtering
-* Maximum holder limit
-* Minimum investment requirement
-* Lock-up period
-* Whitelisted addresses
-* Compliance hooks for mint, burn, and transfer
+| Feature | Description |
+|---|---|
+| KYC-protected transfers | Only verified investors can send/receive |
+| Mint & burn | By authorized agents only |
+| Forced transfer | Regulatory recovery of tokens |
+| Account freezing | Block an address from all activity |
+| Token freezing | Freeze a partial amount of an investor's tokens |
+| Pause / unpause | Emergency stop for the entire token |
+| Property metadata | Name, address, certificate no., appraised value, yield bps, area |
+| Rent distribution | `depositRent` / `claimRent` with per-token accumulator |
+| ERC-3643 hooks | `compliance.canTransfer` checked on every transfer |
 
 ---
 
-### SPVRegistry
+### `IdentityRegistry`
 
-Factory contract used to deploy new property SPVs.
+Manages investor identity on-chain.
 
-Features:
-
-* Deploy new SPV token
-* Deploy compliance module
-* Deploy identity registry (optional)
-* Track deployed SPVs
-* Shared or dedicated identity registry support
+- Investor registration with on-chain identity address mapping
+- Country code (ISO 3166 numeric) per investor
+- Verification status checks
+- Batch registration support
+- Authorized KYC agent management
 
 ---
 
-# Repository Structure
+### `IndoPropertyCompliance`
 
-```text
-contracts/
-├── token/
-│   └── ERC3643Token.sol
-├── spv/
-│   └── IndoPropertySPVToken.sol
-├── identity/
-│   └── IdentityRegistry.sol
-├── compliance/
-│   └── IndoPropertyCompliance.sol
-├── registry/
-│   └── SPVRegistry.sol
-└── interfaces/
-```
+Pluggable compliance engine enforcing regulatory rules per transfer.
+
+| Rule | Details |
+|---|---|
+| Verified investor | Sender and receiver must be registered and verified |
+| Restricted countries | Block transfers to/from specific country codes |
+| Maximum holders | Cap total unique token holders |
+| Minimum investment | Enforce minimum token value in IDR |
+| Lock-up period | Block transfers within N seconds of first acquisition |
+| Whitelist | Bypass standard rules for whitelisted addresses |
+
+Hooks: `created`, `destroyed`, `transferred` — called by the token on mint, burn, and transfer.
 
 ---
 
-# Development
+### `SPVRegistry`
 
-Install dependencies
+Factory contract for deploying new property SPVs.
 
-```bash
-npm install
-forge install
-```
+- Deploy `IndoPropertySPVToken` + `IndoPropertyCompliance` as a pair
+- Optional: reuse shared `IdentityRegistry` or deploy a dedicated one per SPV
+- Track all deployed SPVs on-chain
+- Deactivate SPVs
 
-Compile contracts
-
-```bash
-forge build
-```
-
-Run tests
-
-```bash
-forge test -vvvv
-```
-
-Run frontend
-
-```bash
-npm run dev
-```
+> **Note:** `SPVRegistry` is temporarily excluded from the deployment script due to EVM contract size limits (EIP-170). Optimization settings: `optimizer_runs = 1`, `via_ir = true`. Individual contracts are deployed directly.
 
 ---
 
-# Architecture
+## Architecture
 
 ```
-Investor
-    │
-    ▼
-Identity Registry
-    │
-    ▼
-Compliance Module
-    │
-    ▼
-ERC-3643 SPV Token
-    │
-    ▼
+Investor Wallet
+      │
+      ▼
+IdentityRegistry  ◄──── KYC Agent (off-chain verification)
+      │
+      ▼
+IndoPropertyCompliance
+      │  canTransfer()
+      ▼
+IndoPropertySPVToken  (ERC-3643)
+      │
+      ▼
 Real Estate SPV
 ```
 
 ---
 
-# Regulatory Disclaimer
+## Repository Structure
 
-This project is provided solely for research, educational, and demonstration purposes.
-
-It is **not** an offer to sell securities, investment products, or financial services.
-
-Any production deployment involving tokenized real-world assets would require compliance with applicable laws and regulations, including approval from the relevant regulatory authorities.
+```
+.
+├── contracts/
+│   ├── token/
+│   │   └── ERC3643Token.sol
+│   ├── spv/
+│   │   └── IndoPropertySPVToken.sol
+│   ├── identity/
+│   │   └── IdentityRegistry.sol
+│   ├── compliance/
+│   │   └── IndoPropertyCompliance.sol
+│   ├── registry/
+│   │   └── SPVRegistry.sol
+│   └── interfaces/
+├── test/
+│   └── IndoPropertySPV.t.sol
+├── script/
+│   └── Deploy.s.sol
+└── app/                        # Next.js 15 frontend
+    ├── dashboard/
+    │   └── page.tsx
+    ├── components/
+    │   └── ConnectWallet.tsx
+    ├── lib/
+    │   └── web3/
+    │       └── abi.ts
+    └── providers.tsx
+```
 
 ---
 
+## Testnet Deployment
 
-# Testnet Deployment
+Network: **Mantle Sepolia** (Chain ID: `5003`)
 
-## IndoProperty SPV Token
+| Contract | Address |
+|---|---|
+| SPVToken (PROP) | `0x7a1F4db6309E6EEBb5430a6946F2ac1704eCc0aa` |
+| IdentityRegistry | `0xfBF5f0c0792dfdF1AAA9854A255628aB99b7405C` |
+| Compliance | `0xfB3569b74B1b9f921BD130e0229Ea973691aEaA0` |
 
-```
-0xFC4f507AD62D7E103Ed43da4A0F5B8F671623c28
-```
+Deployer / SPV Manager / KYC Agent: `0x9eF393A3645eb22Fac5F9550fF017a21f87985D7`
 
-## Identity Registry
+> These contracts are deployed for demonstration and testing only. Do not use in production.
 
-```
-0x9a59B64C556F18F85F86ADa0172c0F44b72Fe488
-```
-
-> These contracts are deployed exclusively for demonstrations and testing. They should not be used in production environments.
+Explorer: [explorer.sepolia.mantle.xyz](https://explorer.sepolia.mantle.xyz)
 
 ---
 
-# License
+## Frontend Stack
 
-MIT License
+- **Next.js 15** (App Router)
+- **wagmi v2** + **viem v2**
+- **Reown AppKit** (formerly Web3Modal) for wallet connection
+- **@tanstack/react-query v5**
+- Mantle Sepolia configured as the sole supported network
+
+### Environment Variables
+
+```env
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
+```
+
+Get a project ID at [cloud.reown.com](https://cloud.reown.com).
+
+---
+
+## Development
+
+```bash
+# Install all dependencies
+npm install
+forge install
+
+# Compile contracts
+forge build
+
+# Run tests
+forge test -vvvv
+
+# Deploy to Mantle Sepolia
+forge script script/Deploy.s.sol --rpc-url https://rpc.sepolia.mantle.xyz --broadcast
+
+# Run frontend
+npm run dev
+```
+
+---
+
+## Testing Notes
+
+- `MIN_INVESTMENT` must be satisfied when minting tokens in tests
+- Lock-up constraints bypassed in tests using `vm.warp()`
+- Test framework: Foundry (`forge-std`, `anchor-bankrun` pattern not applicable — pure Solidity tests)
+
+---
+
+## Regulatory Disclaimer
+
+This project is provided solely for **research, educational, and demonstration purposes**.
+
+It is **not** an offer to sell securities, investment products, or financial services. Any production deployment involving tokenized real-world assets would require full compliance with applicable Indonesian regulations (POJK, FATF recommendations) and approval from relevant authorities (OJK, BI).
+
+---
+
+## License
+
+MIT
