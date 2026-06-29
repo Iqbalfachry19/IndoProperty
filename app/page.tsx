@@ -51,7 +51,7 @@ export default function IndoPropertyWebsite() {
       </header>
 
       {/* Hero */}
-      <section className="relative h-[650px] overflow-hidden">
+      <section className="relative h-[500px] overflow-hidden">
         <Image
           src="/unsplash.jpg"
           alt="Indonesian Real Estate"
