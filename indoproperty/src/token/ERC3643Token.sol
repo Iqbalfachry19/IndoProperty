@@ -17,13 +17,13 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
     // =========================================================
     // State
     // =========================================================
-    string  private _tokenVersion;
+    string private _tokenVersion;
     address private _onchainID;
 
     IIdentityRegistry public _identityRegistry;
-    ICompliance       public _compliance;
+    ICompliance public _compliance;
 
-    mapping(address => bool)    private _frozen;
+    mapping(address => bool) private _frozen;
     mapping(address => uint256) private _frozenTokens;
 
     // Authorized agents (transfer agents, issuers)
@@ -33,7 +33,10 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
     // Modifiers
     // =========================================================
     modifier onlyAgent() {
-        require(isAgent[msg.sender] || msg.sender == owner(), "Token: not agent");
+        require(
+            isAgent[msg.sender] || msg.sender == owner(),
+            "Token: not agent"
+        );
         _;
     }
 
@@ -54,9 +57,9 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         string memory version_
     ) ERC20(name_, symbol_) Ownable(msg.sender) {
         _identityRegistry = IIdentityRegistry(identityRegistry_);
-        _compliance       = ICompliance(compliance_);
-        _onchainID        = onchainID_;
-        _tokenVersion     = version_;
+        _compliance = ICompliance(compliance_);
+        _onchainID = onchainID_;
+        _tokenVersion = version_;
         isAgent[msg.sender] = true;
     }
 
@@ -74,20 +77,50 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
     // =========================================================
     // IERC3643 - Info
     // =========================================================
-    function onchainID()       external view override returns (address) { return _onchainID; }
-    function version()         external view override returns (string memory) { return _tokenVersion; }
-    function identityRegistry() external view override returns (address) { return address(_identityRegistry); }
-    function compliance()      external view override returns (address) { return address(_compliance); }
-    function paused()          public view override(Pausable, IERC3643) returns (bool) { return super.paused(); }
-    function isFrozen(address _userAddress)      external view override returns (bool)    { return _frozen[_userAddress]; }
-    function getFrozenTokens(address _userAddress) external view override returns (uint256) { return _frozenTokens[_userAddress]; }
+    function onchainID() external view override returns (address) {
+        return _onchainID;
+    }
+
+    function version() external view override returns (string memory) {
+        return _tokenVersion;
+    }
+
+    function identityRegistry() external view override returns (address) {
+        return address(_identityRegistry);
+    }
+
+    function compliance() external view override returns (address) {
+        return address(_compliance);
+    }
+
+    function paused() public view override(Pausable, IERC3643) returns (bool) {
+        return super.paused();
+    }
+
+    function isFrozen(
+        address _userAddress
+    ) external view override returns (bool) {
+        return _frozen[_userAddress];
+    }
+
+    function getFrozenTokens(
+        address _userAddress
+    ) external view override returns (uint256) {
+        return _frozenTokens[_userAddress];
+    }
 
     // =========================================================
     // IERC3643 - Admin
     // =========================================================
     function setOnchainID(address _id) external override onlyOwner {
         _onchainID = _id;
-        emit UpdatedTokenInformation(name(), symbol(), decimals(), _tokenVersion, _id);
+        emit UpdatedTokenInformation(
+            name(),
+            symbol(),
+            decimals(),
+            _tokenVersion,
+            _id
+        );
     }
 
     function pause() external override onlyAgent {
@@ -100,12 +133,18 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         emit Unpaused(msg.sender);
     }
 
-    function setAddressFrozen(address _userAddress, bool _freeze) external override onlyAgent {
+    function setAddressFrozen(
+        address _userAddress,
+        bool _freeze
+    ) external override onlyAgent {
         _frozen[_userAddress] = _freeze;
         emit AddressFrozen(_userAddress, _freeze, msg.sender);
     }
 
-    function freezePartialTokens(address _userAddress, uint256 _amount) external override onlyAgent {
+    function freezePartialTokens(
+        address _userAddress,
+        uint256 _amount
+    ) external override onlyAgent {
         require(
             balanceOf(_userAddress) - _frozenTokens[_userAddress] >= _amount,
             "Token: insufficient free balance"
@@ -114,13 +153,21 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         emit TokensFrozen(_userAddress, _amount);
     }
 
-    function unfreezePartialTokens(address _userAddress, uint256 _amount) external override onlyAgent {
-        require(_frozenTokens[_userAddress] >= _amount, "Token: insufficient frozen");
+    function unfreezePartialTokens(
+        address _userAddress,
+        uint256 _amount
+    ) external override onlyAgent {
+        require(
+            _frozenTokens[_userAddress] >= _amount,
+            "Token: insufficient frozen"
+        );
         _frozenTokens[_userAddress] -= _amount;
         emit TokensUnfrozen(_userAddress, _amount);
     }
 
-    function setIdentityRegistry(address _registry) external override onlyOwner {
+    function setIdentityRegistry(
+        address _registry
+    ) external override onlyOwner {
         _identityRegistry = IIdentityRegistry(_registry);
         emit IdentityRegistryAdded(_registry);
     }
@@ -135,13 +182,20 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
     // =========================================================
     function mint(address _to, uint256 _amount) external override onlyAgent {
         require(_identityRegistry.isVerified(_to), "Token: receiver not KYC'd");
-        require(_compliance.canTransfer(address(0), _to, _amount), "Token: compliance rejected mint");
+        require(
+            _compliance.canTransfer(address(0), _to, _amount),
+            "Token: compliance rejected mint"
+        );
         _mint(_to, _amount);
         _compliance.created(_to, _amount);
     }
 
-    function burn(address _userAddress, uint256 _amount) external override onlyAgent {
-        uint256 freeBalance = balanceOf(_userAddress) - _frozenTokens[_userAddress];
+    function burn(
+        address _userAddress,
+        uint256 _amount
+    ) external override onlyAgent {
+        uint256 freeBalance = balanceOf(_userAddress) -
+            _frozenTokens[_userAddress];
         require(freeBalance >= _amount, "Token: insufficient free balance");
         _burn(_userAddress, _amount);
         _compliance.destroyed(_userAddress, _amount);
@@ -150,21 +204,33 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
     // =========================================================
     // IERC3643 - Forced Transfer
     // =========================================================
-    function forcedTransfer(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external override onlyAgent returns (bool) {
-        require(_identityRegistry.isVerified(_to), "Token: receiver not KYC'd");
-        uint256 freeBalance = balanceOf(_from) - _frozenTokens[_from];
-        if (_amount > freeBalance) {
-            uint256 toUnfreeze = _amount - freeBalance;
-            _frozenTokens[_from] -= toUnfreeze;
-            emit TokensUnfrozen(_from, toUnfreeze);
+    function _forcedTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal returns (bool) {
+        require(_identityRegistry.isVerified(to), "Token: receiver not KYC'd");
+
+        uint256 freeBalance = balanceOf(from) - _frozenTokens[from];
+
+        if (amount > freeBalance) {
+            uint256 toUnfreeze = amount - freeBalance;
+            _frozenTokens[from] -= toUnfreeze;
+            emit TokensUnfrozen(from, toUnfreeze);
         }
-        _transfer(_from, _to, _amount);
-        _compliance.transferred(_from, _to, _amount);
+
+        _transfer(from, to, amount);
+        _compliance.transferred(from, to, amount);
+
         return true;
+    }
+
+    function forcedTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) external override onlyAgent returns (bool) {
+        return _forcedTransfer(from, to, amount);
     }
 
     // =========================================================
@@ -186,7 +252,8 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         uint256[] calldata _amounts
     ) external override onlyAgent {
         require(
-            _fromList.length == _toList.length && _toList.length == _amounts.length,
+            _fromList.length == _toList.length &&
+                _toList.length == _amounts.length,
             "Token: length mismatch"
         );
         for (uint256 i = 0; i < _fromList.length; i++) {
@@ -194,15 +261,24 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         }
     }
 
-    function batchMint(address[] calldata _toList, uint256[] calldata _amounts) external override onlyAgent {
+    function batchMint(
+        address[] calldata _toList,
+        uint256[] calldata _amounts
+    ) external override onlyAgent {
         require(_toList.length == _amounts.length, "Token: length mismatch");
         for (uint256 i = 0; i < _toList.length; i++) {
             this.mint(_toList[i], _amounts[i]);
         }
     }
 
-    function batchBurn(address[] calldata _userAddresses, uint256[] calldata _amounts) external override onlyAgent {
-        require(_userAddresses.length == _amounts.length, "Token: length mismatch");
+    function batchBurn(
+        address[] calldata _userAddresses,
+        uint256[] calldata _amounts
+    ) external override onlyAgent {
+        require(
+            _userAddresses.length == _amounts.length,
+            "Token: length mismatch"
+        );
         for (uint256 i = 0; i < _userAddresses.length; i++) {
             this.burn(_userAddresses[i], _amounts[i]);
         }
@@ -210,9 +286,12 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
 
     function batchSetAddressFrozen(
         address[] calldata _userAddresses,
-        bool[]    calldata _freeze
+        bool[] calldata _freeze
     ) external override onlyAgent {
-        require(_userAddresses.length == _freeze.length, "Token: length mismatch");
+        require(
+            _userAddresses.length == _freeze.length,
+            "Token: length mismatch"
+        );
         for (uint256 i = 0; i < _userAddresses.length; i++) {
             _frozen[_userAddresses[i]] = _freeze[i];
             emit AddressFrozen(_userAddresses[i], _freeze[i], msg.sender);
@@ -257,7 +336,7 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
             _identityRegistry.investorCountry(_lostWallet)
         );
         _identityRegistry.deleteIdentity(_lostWallet);
-        forcedTransfer(_lostWallet, _newWallet, balance);
+        _forcedTransfer(_lostWallet, _newWallet, balance);
         emit RecoverySuccess(_lostWallet, _newWallet, _investorOnchainID);
         return true;
     }
@@ -269,11 +348,11 @@ abstract contract ERC3643Token is ERC20, Ownable, Pausable, IERC3643 {
         address _from,
         address _to,
         uint256 _value
-    ) internal override whenNotPaused {
+    ) internal virtual override whenNotPaused {
         if (_from != address(0) && _to != address(0)) {
             // Normal transfer: check compliance + frozen state
             require(!_frozen[_from], "Token: sender frozen");
-            require(!_frozen[_to],   "Token: receiver frozen");
+            require(!_frozen[_to], "Token: receiver frozen");
             require(
                 balanceOf(_from) - _frozenTokens[_from] >= _value,
                 "Token: insufficient free balance"

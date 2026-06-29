@@ -15,38 +15,38 @@ contract IndoPropertySPVTest is Test {
     // =========================================================
     // Contracts
     // =========================================================
-    IdentityRegistry      public registry;
+    IdentityRegistry public registry;
     IndoPropertyCompliance public compliance;
-    IndoPropertySPVToken  public token;
-    SPVRegistry           public spvRegistry;
+    IndoPropertySPVToken public token;
+    SPVRegistry public spvRegistry;
 
     // =========================================================
     // Actors
     // =========================================================
-    address public deployer    = makeAddr("deployer");
-    address public spvManager  = makeAddr("spvManager");
-    address public kycAgent    = makeAddr("kycAgent");
-    address public investorA   = makeAddr("investorA");   // Indonesia
-    address public investorB   = makeAddr("investorB");   // Indonesia
-    address public investorC   = makeAddr("investorC");   // Asing (allowed)
-    address public badActor    = makeAddr("badActor");    // No KYC
-    address public northKorea  = makeAddr("northKorea");  // Restricted country
+    address public deployer = makeAddr("deployer");
+    address public spvManager = makeAddr("spvManager");
+    address public kycAgent = makeAddr("kycAgent");
+    address public investorA = makeAddr("investorA"); // Indonesia
+    address public investorB = makeAddr("investorB"); // Indonesia
+    address public investorC = makeAddr("investorC"); // Asing (allowed)
+    address public badActor = makeAddr("badActor"); // No KYC
+    address public northKorea = makeAddr("northKorea"); // Restricted country
 
-    address public identityA   = makeAddr("identityA");
-    address public identityB   = makeAddr("identityB");
-    address public identityC   = makeAddr("identityC");
-    address public identityNK  = makeAddr("identityNK");
+    address public identityA = makeAddr("identityA");
+    address public identityB = makeAddr("identityB");
+    address public identityC = makeAddr("identityC");
+    address public identityNK = makeAddr("identityNK");
 
     // =========================================================
     // Constants
     // =========================================================
-    uint256 constant PROPERTY_VALUE     = 5_000_000_000; // Rp 5 miliar
-    uint256 constant TOKEN_PRICE_IDR    = 10_000_000;    // Rp 10 juta per token
-    uint256 constant TOTAL_SUPPLY       = 500 * 1e18;    // 500 token
-    uint256 constant MIN_INVESTMENT     = 10_000_000 * 1e18; // 1 token minimum
+    uint256 constant PROPERTY_VALUE = 5_000_000_000; // Rp 5 miliar
+    uint256 constant TOKEN_PRICE_IDR = 10_000_000; // Rp 10 juta per token
+    uint256 constant TOTAL_SUPPLY = 500 * 1e18; // 500 token
+    uint256 constant MIN_INVESTMENT = 10_000_000 * 1e18; // 1 token minimum
 
-    uint16 constant ID_INDONESIA  = 360;
-    uint16 constant ID_SINGAPORE  = 702;
+    uint16 constant ID_INDONESIA = 360;
+    uint16 constant ID_SINGAPORE = 702;
     uint16 constant ID_NORTH_KOREA = 408; // Restricted
 
     // =========================================================
@@ -70,11 +70,11 @@ contract IndoPropertySPVTest is Test {
             "SHM-12345/2024",
             PROPERTY_VALUE,
             TOKEN_PRICE_IDR,
-            72,              // 72 m²
-            700,             // 7% yield
+            72, // 72 m²
+            700, // 7% yield
             address(registry),
             address(compliance),
-            address(0),      // onchainID (stub)
+            address(0), // onchainID (stub)
             spvManager
         );
 
@@ -135,10 +135,14 @@ contract IndoPropertySPVTest is Test {
 
     function test_BatchRegisterIdentity() public {
         address[] memory users = new address[](2);
-        address[] memory ids   = new address[](2);
-        uint16[]  memory ctrs  = new uint16[](2);
-        users[0] = makeAddr("u1"); ids[0] = makeAddr("id1"); ctrs[0] = ID_INDONESIA;
-        users[1] = makeAddr("u2"); ids[1] = makeAddr("id2"); ctrs[1] = ID_SINGAPORE;
+        address[] memory ids = new address[](2);
+        uint16[] memory ctrs = new uint16[](2);
+        users[0] = makeAddr("u1");
+        ids[0] = makeAddr("id1");
+        ctrs[0] = ID_INDONESIA;
+        users[1] = makeAddr("u2");
+        ids[1] = makeAddr("id2");
+        ctrs[1] = ID_SINGAPORE;
 
         vm.prank(kycAgent);
         registry.batchRegisterIdentity(users, ids, ctrs);
@@ -175,7 +179,11 @@ contract IndoPropertySPVTest is Test {
         // Sekarang coba transfer ke investorC seolah baru (fresh address)
         address newInvestor = makeAddr("newKyc");
         vm.prank(kycAgent);
-        registry.registerIdentity(newInvestor, makeAddr("newKycId"), ID_INDONESIA);
+        registry.registerIdentity(
+            newInvestor,
+            makeAddr("newKycId"),
+            ID_INDONESIA
+        );
 
         // 0.5 token < min investment 1 token
         assertFalse(compliance.canTransfer(investorA, newInvestor, 5 * 1e17));

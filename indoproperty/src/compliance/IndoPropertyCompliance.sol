@@ -28,17 +28,17 @@ contract IndoPropertyCompliance is ICompliance, Ownable {
     IIdentityRegistry public identityRegistry;
 
     // Rule parameters
-    uint256 public maxHolders        = 300;
-    uint256 public minInvestmentIDR  = 10_000_000 * 1e18; // Rp 10 juta (dalam token units)
-    uint256 public maxHoldingPercent = 20;                 // Max 20% dari total supply
-    uint256 public lockUpPeriod      = 180 days;           // 6 bulan lock-up
+    uint256 public maxHolders = 300;
+    uint256 public minInvestmentIDR = 10_000_000 * 1e18; // Rp 10 juta (dalam token units)
+    uint256 public maxHoldingPercent = 20; // Max 20% dari total supply
+    uint256 public lockUpPeriod = 180 days; // 6 bulan lock-up
 
     // State tracking
     uint256 public holderCount;
     mapping(address => uint256) public holderBalance;
     mapping(address => uint256) public firstAcquisitionTime;
-    mapping(uint16  => bool)    public restrictedCountries;
-    mapping(address => bool)    public whitelisted;        // Exemptions (e.g., SPV itself)
+    mapping(uint16 => bool) public restrictedCountries;
+    mapping(address => bool) public whitelisted; // Exemptions (e.g., SPV itself)
 
     // =========================================================
     // Events
@@ -85,7 +85,10 @@ contract IndoPropertyCompliance is ICompliance, Ownable {
         emit LockUpPeriodUpdated(_period);
     }
 
-    function setCountryRestriction(uint16 _country, bool _restricted) external onlyOwner {
+    function setCountryRestriction(
+        uint16 _country,
+        bool _restricted
+    ) external onlyOwner {
         restrictedCountries[_country] = _restricted;
         emit CountryRestricted(_country, _restricted);
     }
@@ -115,14 +118,20 @@ contract IndoPropertyCompliance is ICompliance, Ownable {
         emit TokenUnbound(_token);
     }
 
-    function isTokenBound(address _token) external view override returns (bool) {
+    function isTokenBound(
+        address _token
+    ) external view override returns (bool) {
         return boundToken == _token;
     }
 
     // =========================================================
     // ICompliance - Transfer Hooks (called by token contract)
     // =========================================================
-    function transferred(address _from, address _to, uint256 _value) external override {
+    function transferred(
+        address _from,
+        address _to,
+        uint256 _value
+    ) external override {
         require(msg.sender == boundToken, "Compliance: caller not token");
 
         // Update holder tracking
@@ -179,16 +188,21 @@ contract IndoPropertyCompliance is ICompliance, Ownable {
         if (!identityRegistry.isVerified(_to)) return false;
 
         // 2. Pengirim harus terverifikasi (kecuali mint dari address(0))
-        if (_from != address(0) && !identityRegistry.isVerified(_from)) return false;
+        if (_from != address(0) && !identityRegistry.isVerified(_from))
+            return false;
 
         // 3. Cek negara terlarang
-        uint16 toCountry   = identityRegistry.investorCountry(_to);
-        uint16 fromCountry = _from != address(0) ? identityRegistry.investorCountry(_from) : 0;
-        if (restrictedCountries[toCountry] || restrictedCountries[fromCountry]) return false;
+        uint16 toCountry = identityRegistry.investorCountry(_to);
+        uint16 fromCountry = _from != address(0)
+            ? identityRegistry.investorCountry(_from)
+            : 0;
+        if (restrictedCountries[toCountry] || restrictedCountries[fromCountry])
+            return false;
 
         // 4. Lock-up period: pengirim harus sudah hold minimal lockUpPeriod
         if (_from != address(0) && firstAcquisitionTime[_from] != 0) {
-            if (block.timestamp < firstAcquisitionTime[_from] + lockUpPeriod) return false;
+            if (block.timestamp < firstAcquisitionTime[_from] + lockUpPeriod)
+                return false;
         }
 
         // 5. Jumlah transfer harus >= minimum investasi (hanya untuk holder baru)
