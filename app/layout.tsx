@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Indonesia Property Tokenization",
 };
 
-import { Providers } from "./providers";
+import { Web3Provider } from "./providers";
 
 export default function RootLayout({
   children,
@@ -30,9 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
+        <Web3Provider>
           {children}
-        </Providers>
+        </Web3Provider>
       </body>
     </html>
   );
